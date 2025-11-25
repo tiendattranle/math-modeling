@@ -1,0 +1,13 @@
+# Requirements for Petri Net Analyzer - CO2011 Assignment
+# Install with: pip install -r requirements.txt
+
+# Binary Decision Diagrams library (for Task 3)
+# Note: Requires CUDD library to be installed separately
+# macOS: brew install cudd
+# Ubuntu: sudo apt-get install libcudd-dev
+dd>=0.5.2
+
+# Integer Linear Programming library (for Tasks 4 and 5)
+# Uses CBC solver by default (included with pulp)
+pulp>=2.6.0
+
