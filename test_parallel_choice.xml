@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/ptnet">
+  <net id="parallelChoiceNet" type="http://www.pnml.org/version-2009/grammar/ptnet">
+
+    <!-- Test case: Choice-based Parallelism (1-safe) -->
+    <!-- Fork creates a CHOICE between left and right paths (not both) -->
+    <!-- This ensures at most 1 token exists at any time -->
+    <!-- Expected: 1-safe, no place ever has more than 1 token -->
+
+    <!-- Places -->
+    <place id="p_start">
+      <name><text>Start</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+
+    <place id="p_left">
+      <name><text>LeftPath</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+
+    <place id="p_right">
+      <name><text>RightPath</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+
+    <place id="p_end">
+      <name><text>End</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+
+    <!-- Transitions -->
+    <transition id="t_choose_left">
+      <name><text>ChooseLeft</text></name>
+    </transition>
+
+    <transition id="t_choose_right">
+      <name><text>ChooseRight</text></name>
+    </transition>
+
+    <transition id="t_process_left">
+      <name><text>ProcessLeft</text></name>
+    </transition>
+
+    <transition id="t_process_right">
+      <name><text>ProcessRight</text></name>
+    </transition>
+
+    <!-- Arcs: Start can go LEFT OR RIGHT (choice) -->
+    <arc id="a1" source="p_start" target="t_choose_left">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a2" source="t_choose_left" target="p_left">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a3" source="p_start" target="t_choose_right">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a4" source="t_choose_right" target="p_right">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <!-- Process and merge -->
+    <arc id="a5" source="p_left" target="t_process_left">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a6" source="t_process_left" target="p_end">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a7" source="p_right" target="t_process_right">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a8" source="t_process_right" target="p_end">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <!-- 
+    Reachable states (all 1-safe):
+    - (1,0,0,0) - initial
+    - (0,1,0,0) - chose left
+    - (0,0,1,0) - chose right
+    - (0,0,0,1) - processed left → end
+    - (0,0,0,1) - processed right → end (same state)
+    
+    Total unique states: 4
+    Max tokens per place: 1 ✓
+    -->
+
+  </net>
+</pnml>
