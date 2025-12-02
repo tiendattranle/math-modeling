@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/ptnet">
+  <net id="manufacturing" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <!-- 
+      Manufacturing Workflow (1-safe)
+      - Assembly line: Parts → Assembly → Quality Check → Package
+      - 1-SAFE: each place has at most 1 token
+    -->
+    
+    <!-- Places -->
+    <place id="p1">
+      <name><text>Parts Ready</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+    
+    <place id="p2">
+      <name><text>Component A</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p3">
+      <name><text>Component B</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p4">
+      <name><text>Assembled Product</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p5">
+      <name><text>Quality Passed</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p6">
+      <name><text>Quality Failed</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p7">
+      <name><text>Packaged</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <!-- Transitions -->
+    <transition id="t1">
+      <name><text>Build Component A</text></name>
+    </transition>
+    
+    <transition id="t2">
+      <name><text>Build Component B</text></name>
+    </transition>
+    
+    <transition id="t3">
+      <name><text>Assemble</text></name>
+    </transition>
+    
+    <transition id="t4">
+      <name><text>Quality Check Pass</text></name>
+    </transition>
+    
+    <transition id="t5">
+      <name><text>Quality Check Fail</text></name>
+    </transition>
+    
+    <transition id="t6">
+      <name><text>Package</text></name>
+    </transition>
+    
+    <!-- Fork into parallel component building -->
+    <arc id="a1" source="p1" target="t1">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a2" source="t1" target="p2">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a3" source="t1" target="p3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <!-- Assembly needs both components -->
+    <arc id="a4" source="p2" target="t3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a5" source="p3" target="t3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a6" source="t3" target="p4">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <!-- Quality check - choice between pass/fail -->
+    <arc id="a7" source="p4" target="t4">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a8" source="t4" target="p5">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <arc id="a9" source="p4" target="t5">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a10" source="t5" target="p6">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <!-- Packaging only if quality passed -->
+    <arc id="a11" source="p5" target="t6">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a12" source="t6" target="p7">
+      <inscription><text>1</text></inscription>
+    </arc>
+  </net>
+</pnml>

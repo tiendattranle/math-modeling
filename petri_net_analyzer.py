@@ -231,7 +231,7 @@ def parse_pnml(file_path: str) -> PetriNet:
     # Set initial marking
     pn.initial_marking = tuple(pn.places[pid].initial_marking for pid in pn.place_ids)
     
-    print(f"✓ PNML file parsed successfully!")
+    print(f" PNML file parsed successfully!")
     print(f"  Places: {len(pn.places)}")
     print(f"  Transitions: {len(pn.transitions)}")
     print(f"  Arcs: {len(pn.arcs)}")
@@ -274,12 +274,12 @@ def verify_consistency(pn: PetriNet) -> bool:
         errors.append("Duplicate transition IDs detected")
     
     if errors:
-        print("✗ Inconsistencies found:")
+        print("	Inconsistencies found:")
         for e in errors:
             print(f"   - {e}")
         return False
     
-    print("✓ Petri net structure is consistent")
+    print("	Petri net structure is consistent")
     return True
 
 
@@ -314,7 +314,7 @@ def explicit_reachability(pn: PetriNet) -> Set[Tuple[int, ...]]:
     
     elapsed_time = time.time() - start_time
     
-    print(f"✓ Found {len(reachable)} reachable markings")
+    print(f"	Found {len(reachable)} reachable markings")
     print(f"  Computation time: {elapsed_time:.4f} seconds")
     print(f"  Memory: ~{sys.getsizeof(reachable) + sum(sys.getsizeof(m) for m in reachable)} bytes")
     
@@ -332,7 +332,7 @@ def symbolic_reachability_bdd(pn: PetriNet) -> Optional[object]:
         BDD representing the set of all reachable markings
     """
     if not BDD_AVAILABLE:
-        print("\n✗ BDD library not available. Install with: pip install dd")
+        print("\n	BDD library not available. Install with: pip install dd")
         return None
     
     print("\n=== Task 3: Symbolic Reachability Computation (BDD) ===")
@@ -399,7 +399,7 @@ def symbolic_reachability_bdd(pn: PetriNet) -> Optional[object]:
     # Count total reachable markings
     total_markings = count_bdd_assignments(bdd_manager, reach_bdd, current_v_vars=list(current_vars.values()))
     
-    print(f"✓ Found {total_markings} reachable markings")
+    print(f"	Found {total_markings} reachable markings")
     print(f"  Computation time: {elapsed_time:.4f} seconds")
     print(f"  Iterations: {iteration}")
     # Get BDD statistics if available
@@ -566,7 +566,7 @@ def deadlock_detection(pn: PetriNet, reachable_markings: Set[Tuple[int, ...]] = 
     
     Args:
         pn: PetriNet object
-        reachable_markings: Set of reachable markings (from explicit computation)
+        reachable_markings: Not used (kept for backward compatibility)
         bdd_result: Tuple (bdd, manager, vars) from symbolic computation
         
     Returns:
@@ -575,48 +575,23 @@ def deadlock_detection(pn: PetriNet, reachable_markings: Set[Tuple[int, ...]] = 
     print("\n=== Task 4: Deadlock Detection (ILP + BDD) ===")
     start_time = time.time()
     
-    # Method 1: Use explicit reachable markings if available
-    if reachable_markings is not None:
-        for marking in reachable_markings:
-            if pn.is_dead_marking(marking):
-                elapsed_time = time.time() - start_time
-                print(f"✓ Deadlock found: {marking}")
-                print(f"  Detection time: {elapsed_time:.4f} seconds")
-                return marking
+    # Use ILP for deadlock detection
+    if not ILP_AVAILABLE:
+        print("\tILP library (pulp) not available. Install with: pip install pulp")
+        return None
     
-    # Method 2: Use BDD to enumerate and check
-    if bdd_result is not None and BDD_AVAILABLE:
-        bdd, bdd_manager, current_vars = bdd_result
-        var_list = list(current_vars.values())
-        
-        # Enumerate all reachable markings from BDD
-        for model in bdd_manager.pick_iter(bdd, care_vars=var_list):
-            # Convert model to marking
-            marking_list = []
-            for pid in pn.place_ids:
-                var = current_vars[pid]
-                marking_list.append(1 if model.get(var, False) else 0)
-            marking = tuple(marking_list)
-            
-            if pn.is_dead_marking(marking):
-                elapsed_time = time.time() - start_time
-                print(f"✓ Deadlock found: {marking}")
-                print(f"  Detection time: {elapsed_time:.4f} seconds")
-                return marking
-    
-    # Method 3: ILP formulation (if pulp is available)
-    if ILP_AVAILABLE:
-        deadlock = deadlock_detection_ilp(pn, bdd_result)
-        if deadlock is not None:
-            elapsed_time = time.time() - start_time
-            print(f"✓ Deadlock found via ILP: {deadlock}")
-            print(f"  Detection time: {elapsed_time:.4f} seconds")
-            return deadlock
+    deadlock = deadlock_detection_ilp(pn, bdd_result)
     
     elapsed_time = time.time() - start_time
-    print(f"✓ No deadlock found")
-    print(f"  Detection time: {elapsed_time:.4f} seconds")
-    return None
+    
+    if deadlock is not None:
+        print(f"\tDeadlock found via ILP: {deadlock}")
+        print(f"  Detection time: {elapsed_time:.4f} seconds")
+        return deadlock
+    else:
+        print(f"\tNo deadlock found")
+        print(f"  Detection time: {elapsed_time:.4f} seconds")
+        return None
 
 
 def deadlock_detection_ilp(pn: PetriNet, bdd_result: Tuple = None) -> Optional[Tuple[int, ...]]:
@@ -664,7 +639,8 @@ def deadlock_detection_ilp(pn: PetriNet, bdd_result: Tuple = None) -> Optional[T
         # Extract marking
         marking_list = []
         for pid in pn.place_ids:
-            marking_list.append(int(M[pid].varValue))
+            val = M[pid].varValue
+            marking_list.append(int(val) if val is not None else 0)
         marking = tuple(marking_list)
         
         # Verify reachability using BDD if available
@@ -697,14 +673,14 @@ def optimize_reachable_markings(pn: PetriNet,
                                 reachable_markings: Set[Tuple[int, ...]] = None,
                                 bdd_result: Tuple = None) -> Optional[Tuple[Tuple[int, ...], int]]:
     """
-    Task 5: Optimize over reachable markings.
+    Task 5: Optimize over reachable markings using ILP.
     
     Maximize c^T * M where M is a reachable marking and c is the objective weight vector.
     
     Args:
         pn: PetriNet object
         objective_weights: List of weights c_p for each place (in order of place_ids)
-        reachable_markings: Set of reachable markings (from explicit computation)
+        reachable_markings: Not used (kept for backward compatibility)
         bdd_result: Tuple (bdd, manager, vars) from symbolic computation
         
     Returns:
@@ -716,52 +692,23 @@ def optimize_reachable_markings(pn: PetriNet,
     if len(objective_weights) != len(pn.place_ids):
         raise ValueError(f"Objective weights length ({len(objective_weights)}) must match number of places ({len(pn.place_ids)})")
     
-    best_marking = None
-    best_value = float('-inf')
+    # Use ILP for optimization
+    if not ILP_AVAILABLE:
+        print("\tILP library (pulp) not available. Install with: pip install pulp")
+        return None
     
-    # Method 1: Enumerate from explicit reachable markings
-    if reachable_markings is not None:
-        for marking in reachable_markings:
-            value = sum(objective_weights[i] * marking[i] for i in range(len(marking)))
-            if value > best_value:
-                best_value = value
-                best_marking = marking
-    
-    # Method 2: Enumerate from BDD
-    elif bdd_result is not None and BDD_AVAILABLE:
-        bdd, bdd_manager, current_vars = bdd_result
-        var_list = list(current_vars.values())
-        
-        for model in bdd_manager.pick_iter(bdd, care_vars=var_list):
-            marking_list = []
-            for pid in pn.place_ids:
-                var = current_vars[pid]
-                marking_list.append(1 if model.get(var, False) else 0)
-            marking = tuple(marking_list)
-            
-            value = sum(objective_weights[i] * marking[i] for i in range(len(marking)))
-            if value > best_value:
-                best_value = value
-                best_marking = marking
-    
-    # Method 3: Use ILP
-    if ILP_AVAILABLE:
-        ilp_result = optimize_reachable_markings_ilp(pn, objective_weights, bdd_result)
-        if ilp_result is not None:
-            marking, value = ilp_result
-            if value > best_value:
-                best_value = value
-                best_marking = marking
+    ilp_result = optimize_reachable_markings_ilp(pn, objective_weights, bdd_result)
     
     elapsed_time = time.time() - start_time
     
-    if best_marking is not None:
-        print(f"✓ Optimal marking found: {best_marking}")
+    if ilp_result is not None:
+        best_marking, best_value = ilp_result
+        print(f"\tOptimal marking found: {best_marking}")
         print(f"  Optimal value: {best_value}")
         print(f"  Computation time: {elapsed_time:.4f} seconds")
         return (best_marking, best_value)
     else:
-        print(f"✗ No reachable marking found")
+        print(f"\tNo reachable marking found")
         print(f"  Computation time: {elapsed_time:.4f} seconds")
         return None
 
@@ -797,7 +744,8 @@ def optimize_reachable_markings_ilp(pn: PetriNet,
     if prob.status == pulp.LpStatusOptimal:
         marking_list = []
         for pid in pn.place_ids:
-            marking_list.append(int(M[pid].varValue))
+            val = M[pid].varValue
+            marking_list.append(int(val) if val is not None else 0)
         marking = tuple(marking_list)
         value = sum(objective_weights[i] * marking[i] for i in range(len(marking)))
         
@@ -831,7 +779,7 @@ def main():
     try:
         pn = parse_pnml(pnml_file)
     except Exception as e:
-        print(f"✗ Error parsing PNML: {e}")
+        print(f"	Error parsing PNML: {e}")
         sys.exit(1)
     
     # Task 2: Explicit reachability
@@ -849,7 +797,7 @@ def main():
             weights = [int(w.strip()) for w in sys.argv[2].split(',')]
             optimize_reachable_markings(pn, weights, reachable_markings, bdd_result)
         except ValueError as e:
-            print(f"✗ Invalid objective weights: {e}")
+            print(f"	Invalid objective weights: {e}")
     else:
         # Default: maximize sum of all tokens
         default_weights = [1] * len(pn.place_ids)

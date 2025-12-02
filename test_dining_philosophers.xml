@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/ptnet">
+  <net id="dining_philosophers" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <!-- 
+      Dining Philosophers Problem (3 philosophers for 1-safe property)
+      - 3 philosophers, 3 forks
+      - Each philosopher needs 2 adjacent forks to eat
+      - 1-SAFE: each place has at most 1 token
+      - Tests deadlock potential and resource contention
+    -->
+    
+    <!-- Places for Philosophers -->
+    <place id="p1">
+      <name><text>Phil 1 Thinking</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+    
+    <place id="p2">
+      <name><text>Phil 1 Eating</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p3">
+      <name><text>Phil 2 Thinking</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+    
+    <place id="p4">
+      <name><text>Phil 2 Eating</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p5">
+      <name><text>Phil 3 Thinking</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+    
+    <place id="p6">
+      <name><text>Phil 3 Eating</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <!-- Places for Forks (resources) -->
+    <place id="fork1">
+      <name><text>Fork 1</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+    
+    <place id="fork2">
+      <name><text>Fork 2</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+    
+    <place id="fork3">
+      <name><text>Fork 3</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+    
+    <!-- Transitions -->
+    <transition id="t1">
+      <name><text>Phil 1 Start Eating</text></name>
+    </transition>
+    
+    <transition id="t2">
+      <name><text>Phil 1 Finish Eating</text></name>
+    </transition>
+    
+    <transition id="t3">
+      <name><text>Phil 2 Start Eating</text></name>
+    </transition>
+    
+    <transition id="t4">
+      <name><text>Phil 2 Finish Eating</text></name>
+    </transition>
+    
+    <transition id="t5">
+      <name><text>Phil 3 Start Eating</text></name>
+    </transition>
+    
+    <transition id="t6">
+      <name><text>Phil 3 Finish Eating</text></name>
+    </transition>
+    
+    <!-- Phil 1: needs fork1 and fork2 -->
+    <arc id="a1" source="p1" target="t1">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a2" source="fork1" target="t1">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a3" source="fork2" target="t1">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a4" source="t1" target="p2">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <arc id="a5" source="p2" target="t2">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a6" source="t2" target="p1">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a7" source="t2" target="fork1">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a8" source="t2" target="fork2">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <!-- Phil 2: needs fork2 and fork3 -->
+    <arc id="a9" source="p3" target="t3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a10" source="fork2" target="t3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a11" source="fork3" target="t3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a12" source="t3" target="p4">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <arc id="a13" source="p4" target="t4">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a14" source="t4" target="p3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a15" source="t4" target="fork2">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a16" source="t4" target="fork3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <!-- Phil 3: needs fork3 and fork1 -->
+    <arc id="a17" source="p5" target="t5">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a18" source="fork3" target="t5">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a19" source="fork1" target="t5">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a20" source="t5" target="p6">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <arc id="a21" source="p6" target="t6">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a22" source="t6" target="p5">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a23" source="t6" target="fork3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a24" source="t6" target="fork1">
+      <inscription><text>1</text></inscription>
+    </arc>
+  </net>
+</pnml>
