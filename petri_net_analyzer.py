@@ -402,11 +402,18 @@ def symbolic_reachability_bdd(pn: PetriNet) -> Optional[object]:
     print(f"	Found {total_markings} reachable markings")
     print(f"  Computation time: {elapsed_time:.4f} seconds")
     print(f"  Iterations: {iteration}")
+    
+    # Memory usage tracking
+    bdd_size = sys.getsizeof(reach_bdd)
+    print(f"  Memory (BDD object): ~{bdd_size} bytes")
+    
     # Get BDD statistics if available
     try:
         stats = bdd_manager.statistics()
         if stats and 'n_nodes' in stats:
             print(f"  BDD node count: {stats['n_nodes']}")
+        if stats and 'mem' in stats:
+            print(f"  BDD memory usage: {stats['mem']} bytes")
         elif stats:
             print(f"  BDD statistics: {stats}")
     except Exception:
