@@ -231,11 +231,11 @@ def parse_pnml(file_path: str) -> PetriNet:
     # Set initial marking
     pn.initial_marking = tuple(pn.places[pid].initial_marking for pid in pn.place_ids)
     
-    print(f" PNML file parsed successfully!")
-    print(f"  Places: {len(pn.places)}")
-    print(f"  Transitions: {len(pn.transitions)}")
-    print(f"  Arcs: {len(pn.arcs)}")
-    print(f"  Initial marking: {pn.initial_marking}")
+    print(f"\tPNML file parsed successfully!")
+    print(f"\tPlaces: {len(pn.places)}")
+    print(f"\tTransitions: {len(pn.transitions)}")
+    print(f"\tArcs: {len(pn.arcs)}")
+    print(f"\tInitial marking: {pn.initial_marking}")
     
     return pn
 
@@ -274,12 +274,12 @@ def verify_consistency(pn: PetriNet) -> bool:
         errors.append("Duplicate transition IDs detected")
     
     if errors:
-        print("	Inconsistencies found:")
+        print("\tInconsistencies found:")
         for e in errors:
-            print(f"   - {e}")
+            print(f"\t - {e}")
         return False
     
-    print("	Petri net structure is consistent")
+    print("\tPetri net structure is consistent")
     return True
 
 
@@ -314,9 +314,9 @@ def explicit_reachability(pn: PetriNet) -> Set[Tuple[int, ...]]:
     
     elapsed_time = time.time() - start_time
     
-    print(f"	Found {len(reachable)} reachable markings")
-    print(f"  Computation time: {elapsed_time:.4f} seconds")
-    print(f"  Memory: ~{sys.getsizeof(reachable) + sum(sys.getsizeof(m) for m in reachable)} bytes")
+    print(f"\tFound {len(reachable)} reachable markings")
+    print(f"\tComputation time: {elapsed_time:.4f} seconds")
+    print(f"\tMemory: ~{sys.getsizeof(reachable) + sum(sys.getsizeof(m) for m in reachable)} bytes")
     
     return reachable
 
@@ -332,7 +332,7 @@ def symbolic_reachability_bdd(pn: PetriNet) -> Optional[object]:
         BDD representing the set of all reachable markings
     """
     if not BDD_AVAILABLE:
-        print("\n	BDD library not available. Install with: pip install dd")
+        print("\n\tBDD library not available. Install with: pip install dd")
         return None
     
     print("\n=== Task 3: Symbolic Reachability Computation (BDD) ===")
@@ -399,23 +399,23 @@ def symbolic_reachability_bdd(pn: PetriNet) -> Optional[object]:
     # Count total reachable markings
     total_markings = count_bdd_assignments(bdd_manager, reach_bdd, current_v_vars=list(current_vars.values()))
     
-    print(f"	Found {total_markings} reachable markings")
-    print(f"  Computation time: {elapsed_time:.4f} seconds")
-    print(f"  Iterations: {iteration}")
+    print(f"\tFound {total_markings} reachable markings")
+    print(f"\tComputation time: {elapsed_time:.4f} seconds")
+    print(f"\tIterations: {iteration}")
     
     # Memory usage tracking
     bdd_size = sys.getsizeof(reach_bdd)
-    print(f"  Memory (BDD object): ~{bdd_size} bytes")
+    print(f"\tMemory (BDD object): ~{bdd_size} bytes")
     
     # Get BDD statistics if available
     try:
         stats = bdd_manager.statistics()
         if stats and 'n_nodes' in stats:
-            print(f"  BDD node count: {stats['n_nodes']}")
+            print(f"\tBDD node count: {stats['n_nodes']}")
         if stats and 'mem' in stats:
-            print(f"  BDD memory usage: {stats['mem']} bytes")
+            print(f"\tBDD memory usage: {stats['mem']} bytes")
         elif stats:
-            print(f"  BDD statistics: {stats}")
+            print(f"\tBDD statistics: {stats}")
     except Exception:
         pass  # Statistics not available
     
@@ -593,11 +593,11 @@ def deadlock_detection(pn: PetriNet, reachable_markings: Set[Tuple[int, ...]] = 
     
     if deadlock is not None:
         print(f"\tDeadlock found via ILP: {deadlock}")
-        print(f"  Detection time: {elapsed_time:.4f} seconds")
+        print(f"\tDetection time: {elapsed_time:.4f} seconds")
         return deadlock
     else:
         print(f"\tNo deadlock found")
-        print(f"  Detection time: {elapsed_time:.4f} seconds")
+        print(f"\tDetection time: {elapsed_time:.4f} seconds")
         return None
 
 
@@ -711,12 +711,12 @@ def optimize_reachable_markings(pn: PetriNet,
     if ilp_result is not None:
         best_marking, best_value = ilp_result
         print(f"\tOptimal marking found: {best_marking}")
-        print(f"  Optimal value: {best_value}")
-        print(f"  Computation time: {elapsed_time:.4f} seconds")
+        print(f"\tOptimal value: {best_value}")
+        print(f"\tComputation time: {elapsed_time:.4f} seconds")
         return (best_marking, best_value)
     else:
         print(f"\tNo reachable marking found")
-        print(f"  Computation time: {elapsed_time:.4f} seconds")
+        print(f"\tComputation time: {elapsed_time:.4f} seconds")
         return None
 
 
@@ -786,7 +786,7 @@ def main():
     try:
         pn = parse_pnml(pnml_file)
     except Exception as e:
-        print(f"	Error parsing PNML: {e}")
+        print(f"\tError parsing PNML: {e}")
         sys.exit(1)
     
     # Task 2: Explicit reachability
@@ -804,7 +804,7 @@ def main():
             weights = [int(w.strip()) for w in sys.argv[2].split(',')]
             optimize_reachable_markings(pn, weights, reachable_markings, bdd_result)
         except ValueError as e:
-            print(f"	Invalid objective weights: {e}")
+            print(f"\tInvalid objective weights: {e}")
     else:
         # Default: maximize sum of all tokens
         default_weights = [1] * len(pn.place_ids)
