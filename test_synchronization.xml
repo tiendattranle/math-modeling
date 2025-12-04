@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/ptnet">
+  <net id="syncNet" type="http://www.pnml.org/version-2009/grammar/ptnet">
+
+    <!-- Test case: Synchronization (Join Pattern, 1-safe) -->
+    <!-- T2 requires BOTH P1 AND P2 to have tokens to fire -->
+    <!-- This is a proper 1-safe synchronization pattern -->
+    <!-- Expected reachable states: {(1,1,0), (0,0,1)} -->
+
+    <!-- Places -->
+    <place id="p1">
+      <name><text>P1</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+
+    <place id="p2">
+      <name><text>P2</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+
+    <place id="p3">
+      <name><text>P3</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+
+    <!-- Transitions -->
+    <transition id="t_sync">
+      <name><text>Synchronize</text></name>
+    </transition>
+
+    <!-- Arcs: T_sync requires both P1 and P2 -->
+    <arc id="a1" source="p1" target="t_sync">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a2" source="p2" target="t_sync">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a3" source="t_sync" target="p3">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+  </net>
+</pnml>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/ptnet">
+  <net id="deadlockNet" type="http://www.pnml.org/version-2009/grammar/ptnet">
+
+    <!-- Places -->
+    <place id="p1">
+      <name><text>P1</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+
+    <place id="p2">
+      <name><text>P2</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+
+    <place id="p3">
+      <name><text>P3</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+
+    <!-- Transitions -->
+    <transition id="t1">
+      <name><text>T1</text></name>
+    </transition>
+
+    <transition id="t2">
+      <name><text>T2</text></name>
+    </transition>
+
+    <!-- Arcs -->
+    <arc id="a1" source="p1" target="t1">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a2" source="t1" target="p2">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a3" source="p2" target="t2">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <arc id="a4" source="p3" target="t2">
+      <inscription><text>1</text></inscription>
+    </arc>
+
+    <!-- Note: t2 requires both p2 and p3, but p3 never gets a token -->
+    <!-- After firing t1, we reach (0,1,0) which is a deadlock -->
+
+  </net>
+</pnml>
+

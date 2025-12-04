@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/ptnet">
+  <net id="free_choice" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <!-- 
+      Free Choice Petri Net
+      - Important subclass where conflicts are localized
+      - If a place has multiple output transitions, no other place shares those transitions
+      - Pattern: p1 can choose between t1 and t2 freely
+      - After choice, execution continues deterministically
+    -->
+    
+    <!-- Places -->
+    <place id="p1">
+      <name><text>Start</text></name>
+      <initialMarking><text>1</text></initialMarking>
+    </place>
+    
+    <place id="p2">
+      <name><text>Path A</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p3">
+      <name><text>Path B</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p4">
+      <name><text>End A</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <place id="p5">
+      <name><text>End B</text></name>
+      <initialMarking><text>0</text></initialMarking>
+    </place>
+    
+    <!-- Transitions -->
+    <transition id="t1">
+      <name><text>Choose A</text></name>
+    </transition>
+    
+    <transition id="t2">
+      <name><text>Choose B</text></name>
+    </transition>
+    
+    <transition id="t3">
+      <name><text>Complete A</text></name>
+    </transition>
+    
+    <transition id="t4">
+      <name><text>Complete B</text></name>
+    </transition>
+    
+    <!-- Free choice from p1 -->
+    <arc id="a1" source="p1" target="t1">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a2" source="t1" target="p2">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <arc id="a3" source="p1" target="t2">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a4" source="t2" target="p3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <!-- Deterministic continuation -->
+    <arc id="a5" source="p2" target="t3">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a6" source="t3" target="p4">
+      <inscription><text>1</text></inscription>
+    </arc>
+    
+    <arc id="a7" source="p3" target="t4">
+      <inscription><text>1</text></inscription>
+    </arc>
+    <arc id="a8" source="t4" target="p5">
+      <inscription><text>1</text></inscription>
+    </arc>
+  </net>
+</pnml>
