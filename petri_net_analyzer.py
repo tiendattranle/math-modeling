@@ -314,9 +314,10 @@ def explicit_reachability(pn: PetriNet) -> Set[Tuple[int, ...]]:
     
     elapsed_time = time.time() - start_time
     
-    print(f"\tFound {len(reachable)} reachable markings")
-    print(f"\t  -  {r}" for r in reachable)
-    print(f"\tComputation time: {elapsed_time:.4f} seconds")
+    print(f"\tFound {len(reachable)} reachable markings:")
+    for r in reachable:
+        print(f"\t  -  {r}")
+    print(f"\tComputation time: {elapsed_time * 1000000000:.4f} nanoseconds")
     print(f"\tMemory: ~{sys.getsizeof(reachable) + sum(sys.getsizeof(m) for m in reachable)} bytes")
     
     return reachable
@@ -395,13 +396,13 @@ def symbolic_reachability_bdd(pn: PetriNet) -> Optional[object]:
             break
         prev_size = count
     
+    elapsed_time = time.time() - start_time
+    
     # Count total reachable markings
     total_markings = count_bdd_assignments(bdd_manager, reach_bdd, current_v_vars=list(current_vars.values()))
     
-    elapsed_time = time.time() - start_time
-    
     print(f"\tFound {total_markings} reachable markings")
-    print(f"\tComputation time: {elapsed_time:.4f} seconds")
+    print(f"\tComputation time: {elapsed_time * 1000000000:.4f} nanoseconds")
     print(f"\tIterations: {iteration}")
     
     # Memory usage tracking
