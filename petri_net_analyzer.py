@@ -396,13 +396,11 @@ def symbolic_reachability_bdd(pn: PetriNet) -> Optional[object]:
         prev_size = count
     
     # Count total reachable markings
-    reachable = list_bdd_markings_as_tuples(bdd_manager, reach_bdd, current_v_vars=list(current_vars.values()))
     total_markings = count_bdd_assignments(bdd_manager, reach_bdd, current_v_vars=list(current_vars.values()))
     
     elapsed_time = time.time() - start_time
     
     print(f"\tFound {total_markings} reachable markings")
-    print(f"\t  -  {r}" for r in reachable)
     print(f"\tComputation time: {elapsed_time:.4f} seconds")
     print(f"\tIterations: {iteration}")
     
@@ -565,19 +563,6 @@ def count_bdd_assignments(bdd_manager, bdd_expr, current_v_vars: List[str]) -> i
             except Exception:
                 continue
         return count
-
-
-def list_bdd_markings_as_tuples(bdd_manager, bdd_expr, current_v_vars: List[str]) -> List[Tuple[int, ...]]:
-    """Return all satisfying assignments as tuples like (0,1,0)."""
-
-    markings = []
-
-    for full_assignment in bdd_manager.sat_iter(bdd_expr):
-        # Build tuple in variable order
-        tup = tuple(full_assignment.get(var, 0) for var in current_v_vars)
-        markings.append(tup)
-
-    return markings
 
 
 def deadlock_detection(pn: PetriNet, reachable_markings: Set[Tuple[int, ...]] = None,
